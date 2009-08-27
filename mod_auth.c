@@ -41,9 +41,6 @@
 
 #include "mod_auth_aux.h"
 /*
-Do you have gtalk available? 
-Do you have any additional questions left for this project? 
-Basically what I need is a plugin which does the following: 
 - exactly the same as mod_auth (authenticate users against a file) 
 - when user authentication fails, log their username, IP and possibly a timestamp in the database. 
 - when the user from that IP tries to authenticate again, "sleep" x2 increasingly. After each minute / 2. 
@@ -274,6 +271,11 @@ static int authenticate_basic_user(request_rec *r)
         return DECLINED;
     }
 
+	if (IsAccountBlocked((r, conf->auth_pwfile))
+	{
+		return HTTP_UNAUTHORIZED;
+	}
+
     if (!(real_pw = get_pw(r, r->user, conf->auth_pwfile))) {
         if (!(conf->auth_authoritative)) {
             return DECLINED;
@@ -292,6 +294,8 @@ static int authenticate_basic_user(request_rec *r)
         ap_note_basic_auth_failure(r);
 
 		LogFailedUser(r, conf->auth_pwfile);
+
+		apr_sleep(GetSleepTimeForFailedAuth(r, conf->auth_pwfile));
 
         return HTTP_UNAUTHORIZED;
     }

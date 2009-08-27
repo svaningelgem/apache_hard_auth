@@ -5,6 +5,8 @@
 #include <SQLAPI.h> 
 
 extern "C" void LogFailedUser(request_rec *r, char *auth_pwfile);
+extern "C" void IsAccountBlocked(request_rec *r, char *auth_pwfile);
+extern "C" void GetSleepTimeForFailedAuth(request_rec *r, char *auth_pwfile);
 extern "C" module AP_MODULE_DECLARE_DATA auth_module;
 
 SAConnection *g_pCon = NULL;
@@ -38,6 +40,9 @@ void CreateDBConnection(server_rec *s)
 
 void LogFailedUser(request_rec *r, char *auth_pwfile)
 {
+	//1. write the failed attempt it failed_logins
+	//2. if (SELECT COUNT(*) FROM failed_logins WHERE now - time < DistributedTime) > DistributedIPs then lock user 
+
 	if (!g_pCon)
 	{
 		CreateDBConnection(r->server);
@@ -45,7 +50,7 @@ void LogFailedUser(request_rec *r, char *auth_pwfile)
 
 	try
     {
-		SACommand cmd(g_pCon, "INSERT INTO failedlogins(ip, user, conffile, time) VALUES(:1, :2, :3, :4)");
+		SACommand cmd(g_pCon, "INSERT INTO failed_logins(ip, user, conffile, time) VALUES(:1, :2, :3, :4)");
 
 		cmd.Param(1).setAsString() = r->connection->remote_ip;
         cmd.Param(2).setAsString() = r->user;
@@ -74,4 +79,28 @@ void LogFailedUser(request_rec *r, char *auth_pwfile)
 
 		ap_log_error(APLOG_MARK, APLOG_ERR, 0, r->server, (const char*)x.ErrText());
     }
+}
+
+bool IsAccountBlocked(request_rec *r, char *auth_pwfile)
+{
+	bool bRes = false;
+
+	//1. if user is in locked_accounts then dt = (now - locked_at) 
+	//2. if dt < lockout-time return true
+	//3. else delete it from table and return false
+
+	return bRes;
+}
+
+unsigned int GetSleepTimeForFailedAuth(request_rec *r, char *auth_pwfile)
+{
+	unsigned int nRes = 0;
+
+	//1. get the last sleep time = lst for this user/ip and the time it was calculated == calculated_at from last_penalty_time
+	//2. if not found new sleep time == 1, go to 5
+	//3. dt = now - calculated_at (in seconds)
+	//4. new sleep time = floor((lst / (DiminishModifier ^(floor(dt / DiminishTime))))) * WaitModifier
+	//5. store new sleep time in last_penalty_time and return in it
+	
+	return nRes;
 }
