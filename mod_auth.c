@@ -85,64 +85,64 @@ static const char *set_auth_slot(cmd_parms *cmd, void *offset, const char *f,
 
 static const char *set_WaitModifier(cmd_parms *cmd, void *offset, const char *f, const char *t)
 {
-	mod_auth_aux_rec *modcfg = ap_get_module_config(cmd->server->module_config, &auth_module);
-	modcfg->WaitModifier = atoi(f);
+    mod_auth_aux_rec *modcfg = ap_get_module_config(cmd->server->module_config, &auth_module);
+    modcfg->WaitModifier = atoi(f);
     return NULL;
 }
 
 static const char *set_DiminishTime(cmd_parms *cmd, void *offset, const char *f, const char *t)
 {
-	mod_auth_aux_rec *modcfg = ap_get_module_config(cmd->server->module_config, &auth_module);
-	modcfg->DiminishTime = atoi(f);
+    mod_auth_aux_rec *modcfg = ap_get_module_config(cmd->server->module_config, &auth_module);
+    modcfg->DiminishTime = atoi(f);
     return NULL;
 }
 
 static const char *set_DiminishModifier(cmd_parms *cmd, void *offset, const char *f, const char *t)
 {
-	mod_auth_aux_rec *modcfg = ap_get_module_config(cmd->server->module_config, &auth_module);
-	modcfg->DiminishModifier = atoi(f);
+    mod_auth_aux_rec *modcfg = ap_get_module_config(cmd->server->module_config, &auth_module);
+    modcfg->DiminishModifier = atoi(f);
     return NULL;
 }
 
 static const char *set_DistributedIPs(cmd_parms *cmd, void *offset, const char *f, const char *t)
 {
-	mod_auth_aux_rec *modcfg = ap_get_module_config(cmd->server->module_config, &auth_module);
-	modcfg->DistributedIPs = atoi(f);
+    mod_auth_aux_rec *modcfg = ap_get_module_config(cmd->server->module_config, &auth_module);
+    modcfg->DistributedIPs = atoi(f);
     return NULL;
 }
 
 static const char *set_DistributedTime(cmd_parms *cmd, void *offset, const char *f, const char *t)
 {
-	mod_auth_aux_rec *modcfg = ap_get_module_config(cmd->server->module_config, &auth_module);
-	modcfg->DistributedTime = atoi(f);
+    mod_auth_aux_rec *modcfg = ap_get_module_config(cmd->server->module_config, &auth_module);
+    modcfg->DistributedTime = atoi(f);
     return NULL;
 }
 
 static const char *set_LockoutTime(cmd_parms *cmd, void *offset, const char *f, const char *t)
 {
-	mod_auth_aux_rec *modcfg = ap_get_module_config(cmd->server->module_config, &auth_module);
-	modcfg->LockoutTime = atoi(f);
+    mod_auth_aux_rec *modcfg = ap_get_module_config(cmd->server->module_config, &auth_module);
+    modcfg->LockoutTime = atoi(f);
     return NULL;
 }
 
 static const char *set_DBName(cmd_parms *cmd, void *offset, const char *f, const char *t)
 {
-	mod_auth_aux_rec *modcfg = ap_get_module_config(cmd->server->module_config, &auth_module);
-	modcfg->DBName = (char*)f;
+    mod_auth_aux_rec *modcfg = ap_get_module_config(cmd->server->module_config, &auth_module);
+    modcfg->DBName = (char*)f;
     return NULL;
 }
 
 static const char *set_DBUser(cmd_parms *cmd, void *offset, const char *f, const char *t)
 {
-	mod_auth_aux_rec *modcfg = ap_get_module_config(cmd->server->module_config, &auth_module);
-	modcfg->DBUser = (char*)f;
+    mod_auth_aux_rec *modcfg = ap_get_module_config(cmd->server->module_config, &auth_module);
+    modcfg->DBUser = (char*)f;
     return NULL;
 }
 
 static const char *set_DBPassword(cmd_parms *cmd, void *offset, const char *f, const char *t)
 {
-	mod_auth_aux_rec *modcfg = ap_get_module_config(cmd->server->module_config, &auth_module);
-	modcfg->DBPassword = (char*)f;
+    mod_auth_aux_rec *modcfg = ap_get_module_config(cmd->server->module_config, &auth_module);
+    modcfg->DBPassword = (char*)f;
     return NULL;
 }
 
@@ -160,15 +160,15 @@ static const command_rec auth_cmds[] =
                  OR_AUTHCFG,
                  "Set to 'no' to allow access control to be passed along to "
                  "lower modules if the UserID is not known to this module"),
-	AP_INIT_TAKE1("ModAuth_WaitModifier", set_WaitModifier, NULL, RSRC_CONF, "Default is 2"),
-	AP_INIT_TAKE1("ModAuth_DiminishTime", set_DiminishTime, NULL, RSRC_CONF, "Default is 60"),
-	AP_INIT_TAKE1("ModAuth_DiminishModifier", set_DiminishModifier, NULL, RSRC_CONF, "Default is 2"),
-	AP_INIT_TAKE1("ModAuth_DistributedIPs", set_DistributedIPs, NULL, RSRC_CONF, "Default is 10"),
-	AP_INIT_TAKE1("ModAuth_DistributedTime", set_DistributedTime, NULL, RSRC_CONF, "Default is 60"),
-	AP_INIT_TAKE1("ModAuth_LockoutTime", set_LockoutTime, NULL, RSRC_CONF, "Default is 1200"),
-	AP_INIT_TAKE1("ModAuth_DBName", set_DBName, NULL, RSRC_CONF, "Default is mod_auth"),
-	AP_INIT_TAKE1("ModAuth_DBUser", set_DBUser, NULL, RSRC_CONF, "No Default"),
-	AP_INIT_TAKE1("ModAuth_DBPassword", set_DBPassword, NULL, RSRC_CONF, "No Default"),
+    AP_INIT_TAKE1("ModAuth_WaitModifier", set_WaitModifier, NULL, RSRC_CONF, "Default is 2"),
+    AP_INIT_TAKE1("ModAuth_DiminishTime", set_DiminishTime, NULL, RSRC_CONF, "Default is 60"),
+    AP_INIT_TAKE1("ModAuth_DiminishModifier", set_DiminishModifier, NULL, RSRC_CONF, "Default is 2"),
+    AP_INIT_TAKE1("ModAuth_DistributedIPs", set_DistributedIPs, NULL, RSRC_CONF, "Default is 10"),
+    AP_INIT_TAKE1("ModAuth_DistributedTime", set_DistributedTime, NULL, RSRC_CONF, "Default is 60"),
+    AP_INIT_TAKE1("ModAuth_LockoutTime", set_LockoutTime, NULL, RSRC_CONF, "Default is 1200"),
+    AP_INIT_TAKE1("ModAuth_DBName", set_DBName, NULL, RSRC_CONF, "Default is mod_auth"),
+    AP_INIT_TAKE1("ModAuth_DBUser", set_DBUser, NULL, RSRC_CONF, "No Default"),
+    AP_INIT_TAKE1("ModAuth_DBPassword", set_DBPassword, NULL, RSRC_CONF, "No Default"),
     {NULL}
 };
 
@@ -254,6 +254,9 @@ static apr_table_t *groups_for_user(request_rec *r, char *user, char *grpfile)
  * basic authentication...
  */
 void LogFailedUser(request_rec *r, char *auth_pwfile);
+int IsAccountLocked(request_rec *r, char *auth_pwfile);
+unsigned int GetSleepTimeForFailedAuth(request_rec *r, char *auth_pwfile);
+
 static int authenticate_basic_user(request_rec *r)
 {
     auth_config_rec *conf = ap_get_module_config(r->per_dir_config,
@@ -271,10 +274,10 @@ static int authenticate_basic_user(request_rec *r)
         return DECLINED;
     }
 
-	if (IsAccountBlocked((r, conf->auth_pwfile))
-	{
-		return HTTP_UNAUTHORIZED;
-	}
+    if (IsAccountLocked(r, conf->auth_pwfile))
+    {
+        return HTTP_UNAUTHORIZED;
+    }
 
     if (!(real_pw = get_pw(r, r->user, conf->auth_pwfile))) {
         if (!(conf->auth_authoritative)) {
@@ -293,9 +296,9 @@ static int authenticate_basic_user(request_rec *r)
                       r->user, r->uri);
         ap_note_basic_auth_failure(r);
 
-		LogFailedUser(r, conf->auth_pwfile);
+        LogFailedUser(r, conf->auth_pwfile);
 
-		apr_sleep(GetSleepTimeForFailedAuth(r, conf->auth_pwfile));
+        apr_sleep(GetSleepTimeForFailedAuth(r, conf->auth_pwfile));
 
         return HTTP_UNAUTHORIZED;
     }
@@ -406,24 +409,24 @@ static void register_hooks(apr_pool_t *p)
  */
 static void *create_perserver_config(apr_pool_t *p, server_rec *s)
 {
-	mod_auth_aux_rec *newcfg;
+    mod_auth_aux_rec *newcfg;
 
-	// allocate space for the configuration structure from the provided pool p.
-	newcfg = (mod_auth_aux_rec*)apr_pcalloc(p, sizeof(mod_auth_aux_rec));
+    // allocate space for the configuration structure from the provided pool p.
+    newcfg = (mod_auth_aux_rec*)apr_pcalloc(p, sizeof(mod_auth_aux_rec));
 
-	newcfg->WaitModifier = 2;
-	newcfg->DiminishTime = 60;
-	newcfg->DiminishModifier = 2;
-	newcfg->DistributedIPs = 10;
-	newcfg->DistributedTime = 60;
-	newcfg->LockoutTime = 1200;
+    newcfg->WaitModifier = 2;
+    newcfg->DiminishTime = 60;
+    newcfg->DiminishModifier = 2;
+    newcfg->DistributedIPs = 10;
+    newcfg->DistributedTime = 60;
+    newcfg->LockoutTime = 1200;
 
-	newcfg->DBName = "mod_auth";
-	newcfg->DBUser = "";
-	newcfg->DBPassword = "";
+    newcfg->DBName = "mod_auth";
+    newcfg->DBUser = "";
+    newcfg->DBPassword = "";
 
-	// return the new server configuration structure.
-	return (void *) newcfg;
+    // return the new server configuration structure.
+    return (void *) newcfg;
 }
 
 module AP_MODULE_DECLARE_DATA auth_module =
