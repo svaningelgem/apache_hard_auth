@@ -255,7 +255,7 @@ static apr_table_t *groups_for_user(request_rec *r, char *user, char *grpfile)
  */
 void LogFailedUser(request_rec *r, char *auth_pwfile);
 int IsAccountLocked(request_rec *r, char *auth_pwfile);
-unsigned int GetSleepTimeForFailedAuth(request_rec *r, char *auth_pwfile);
+unsigned int GetSleepTimeForFailedAuthInSec(request_rec *r, char *auth_pwfile);
 
 static int authenticate_basic_user(request_rec *r)
 {
@@ -298,7 +298,7 @@ static int authenticate_basic_user(request_rec *r)
 
         LogFailedUser(r, conf->auth_pwfile);
 
-        apr_sleep(GetSleepTimeForFailedAuth(r, conf->auth_pwfile));
+        apr_sleep(GetSleepTimeForFailedAuthInSec(r, conf->auth_pwfile) * APR_USEC_PER_SEC);
 
         return HTTP_UNAUTHORIZED;
     }

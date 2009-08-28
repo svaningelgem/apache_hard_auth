@@ -3,10 +3,11 @@
 #include "http_log.h"
 #include "mod_auth_aux.h"
 #include <SQLAPI.h> 
+#include <math.h>
 
 extern "C" void LogFailedUser(request_rec *r, char *auth_pwfile);
 extern "C" int IsAccountLocked(request_rec *r, char *auth_pwfile);
-extern "C" unsigned int GetSleepTimeForFailedAuth(request_rec *r, char *auth_pwfile);
+extern "C" unsigned int GetSleepTimeForFailedAuthInSec(request_rec *r, char *auth_pwfile);
 extern "C" module AP_MODULE_DECLARE_DATA auth_module;
 
 SAConnection *g_pCon = NULL;
@@ -114,20 +115,20 @@ int IsAccountLocked(request_rec *r, char *auth_pwfile)
     try
     {
         //1. if user is in locked_accounts then dt = (now - locked_at) 
-        SACommand selectcmd(g_pCon, "SELECT COUNT(*) AS count, NOW()-locked_at AS timedelta FROM locked_accounts WHERE user=:1 AND passfile=:2");
+        SACommand selectcmd(g_pCon, "SELECT NOW()-locked_at AS timedelta FROM locked_accounts WHERE user=:1 AND passfile=:2");
         selectcmd.Param(1).setAsString() = r->user;
         selectcmd.Param(2).setAsString() = auth_pwfile;
         selectcmd.Execute();
 
         unsigned int nTimeDelta = 0;
-        unsigned int nCount = 0;
+        bool bIsUseFound = false;
         while (selectcmd.FetchNext())
         {
             nTimeDelta = selectcmd.Field("timedelta").asLong();
-            nCount = selectcmd.Field("count").asLong();
+            bIsUseFound = true;
         }
 
-        if (nCount > 0)
+        if (bIsUseFound)
         {
             if (nTimeDelta < modcfg->LockoutTime)
             {
@@ -169,18 +170,83 @@ int IsAccountLocked(request_rec *r, char *auth_pwfile)
     return nRes;
 }
 
-
-//1. get the last sleep time = lst for this user/ip and the time it was calculated == calculated_at from last_penalty_time
-//2. if not found new sleep time == 1, go to 6
-//3. dt = now - calculated_at (in seconds)
-//4. new sleep time = floor((lst / (DiminishModifier ^(floor(dt / DiminishTime))))) * WaitModifier
-//5. update new sleep time in last_penalty_time and return it
-//6. insert new sleep time = 1 and return itunsigned int GetSleepTimeForFailedAuth(request_rec *r, char *auth_pwfile)
-unsigned int GetSleepTimeForFailedAuth(request_rec *r, char *auth_pwfile)
+unsigned int GetSleepTimeForFailedAuthInSec(request_rec *r, char *auth_pwfile)
 {
-    unsigned int nRes = 0;
+    mod_auth_aux_rec *modcfg = (mod_auth_aux_rec *)ap_get_module_config(r->server->module_config, &auth_module);
 
+    if (!g_pCon)
+    {
+        CreateDBConnection(r->server);
+    }
 
+    unsigned int nNewSleepTimeInSec = 0;
+
+    try
+    {
+        //1. get the last sleep time = lst for this user/ip and the time it was calculated == calculated_at from last_penalty_time
+        SACommand selectcmd(g_pCon, "SELECT sleeptime_in_sec, NOW() - calculated_at AS timedelta FROM last_penalty_time WHERE user=:1 AND passfile=:2 AND ip=:3");
+        selectcmd.Param(1).setAsString() = r->user;
+        selectcmd.Param(2).setAsString() = auth_pwfile;
+        selectcmd.Param(3).setAsString() = r->connection->remote_ip;
+        selectcmd.Execute();
+
+        unsigned int nLastSleepTime = 0;
+        unsigned int nTimeDelta = 0;
+        bool bIsUseFound = false;
+        while (selectcmd.FetchNext())
+        {
+            nLastSleepTime = selectcmd.Field("sleeptime_in_sec").asLong();
+            nTimeDelta = selectcmd.Field("timedelta").asLong();
+            bIsUseFound = true;
+        }
+
+        if (!bIsUseFound)
+        {
+            //2. if not found insert new sleep time = 1 in last_penalty_time and return it 
+            nNewSleepTimeInSec = 1;
+
+            SACommand insertcmd(g_pCon, "INSERT INTO last_penalty_time(user, passfile, ip, sleeptime_in_sec, calculated_at) VALUES(:1, :2, :3, :4, NOW())");
+            insertcmd.Param(1).setAsString() = r->user;
+            insertcmd.Param(2).setAsString() = auth_pwfile;
+            insertcmd.Param(3).setAsString() = r->connection->remote_ip;
+            insertcmd.Param(4).setAsLong() = nNewSleepTimeInSec;
+            insertcmd.Execute();
+            g_pCon->Commit();
+        }
+        else
+        {
+            //4. new sleep time = floor((lst / (DiminishModifier ^(floor(timedelta / DiminishTime))))) * WaitModifier
+            double param1 = floor((double)nTimeDelta / (double)modcfg->DiminishTime);
+            double param2 = pow((double)modcfg->DiminishModifier, param1);
+            nNewSleepTimeInSec = (unsigned int)(floor((double)nLastSleepTime / param2) * (double)modcfg->WaitModifier);
+            if (nNewSleepTimeInSec == 0)
+            {
+                nNewSleepTimeInSec = 1;
+            }
+
+            //5. update new sleep time in last_penalty_time and return it
+            SACommand updatecmd(g_pCon, "UPDATE last_penalty_time SET sleeptime_in_sec=:1, calculated_at=NOW() WHERE user=:2 AND passfile=:3 AND ip=:4");
+            updatecmd.Param(1).setAsLong() = nNewSleepTimeInSec;
+            updatecmd.Param(2).setAsString() = r->user;
+            updatecmd.Param(3).setAsString() = auth_pwfile;
+            updatecmd.Param(4).setAsString() = r->connection->remote_ip;
+            updatecmd.Execute();
+            g_pCon->Commit();
+        }
+    }
+    catch(SAException &x)
+    {
+        try
+        {
+            g_pCon->Rollback();
+            g_pCon->Disconnect();delete g_pCon; g_pCon = NULL;
+        }
+        catch(SAException &)
+        {
+        }
+
+        ap_log_error(APLOG_MARK, APLOG_ERR, 0, r->server, (const char*)x.ErrText());
+    }
     
-    return nRes;
+    return nNewSleepTimeInSec;
 }

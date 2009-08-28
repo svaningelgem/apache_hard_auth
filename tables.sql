@@ -29,12 +29,12 @@ CREATE TABLE locked_accounts
 DROP TABLE IF EXISTS last_penalty_time;
 CREATE TABLE last_penalty_time
 (
-    id              INT(9) NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    user            VARCHAR(128),
-    passfile        VARCHAR(255),
-    ip              VARCHAR(15),    
-    sleeptime       INT(9),
-    calculated_at   TIMESTAMP,
+    id               INT(9) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    user             VARCHAR(128),
+    passfile         VARCHAR(255),
+    ip               VARCHAR(15),    
+    sleeptime_in_sec INT(9),
+    calculated_at    TIMESTAMP,
     INDEX(user),
     INDEX(passfile)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
