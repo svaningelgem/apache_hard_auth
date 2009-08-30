@@ -2,7 +2,7 @@ I. For Windows
 	
 1. Open the Apache solution and compile it as described here http://httpd.apache.org/docs/2.0/platform/win_compiling.html
 2. If you compile Apache successfully you might proceed further
-3. Copy mod_auth_aux.cpp and mod_auth_aux.h in the modules\aaa\Debug\ folder
+3. Copy mod_auth_aux.cpp and mod_auth_aux.h in the modules\aaa folder
 4. Replace mod_auth.c wih the modified version
 5. Right click on mod_auth project and choose "Add New Item", then add mod_auth_aux.cpp and mod_auth_aux.h to the mod_auth project
 6. Click mod_auth project properties and:
