@@ -39,7 +39,7 @@
 #include "http_protocol.h"
 #include "http_request.h"
 
-#include "mod_auth_aux.h"
+#include "mod_auth_hard_aux.h"
 /*
 - exactly the same as mod_auth (authenticate users against a file) 
 - when user authentication fails, log their username, IP and possibly a timestamp in the database. 
@@ -83,63 +83,63 @@ static const char *set_auth_slot(cmd_parms *cmd, void *offset, const char *f,
     return ap_set_file_slot(cmd, offset, f);
 }
 
-static const char *set_WaitModifier(cmd_parms *cmd, void *offset, const char *f, const char *t)
+static const char *set_WaitModifier(cmd_parms *cmd, void *offset, const char *f)
 {
     mod_auth_aux_rec *modcfg = ap_get_module_config(cmd->server->module_config, &auth_hard_module );
     modcfg->WaitModifier = atoi(f);
     return NULL;
 }
 
-static const char *set_DiminishTime(cmd_parms *cmd, void *offset, const char *f, const char *t)
+static const char *set_DiminishTime(cmd_parms *cmd, void *offset, const char *f)
 {
     mod_auth_aux_rec *modcfg = ap_get_module_config(cmd->server->module_config, &auth_hard_module );
     modcfg->DiminishTime = atoi(f);
     return NULL;
 }
 
-static const char *set_DiminishModifier(cmd_parms *cmd, void *offset, const char *f, const char *t)
+static const char *set_DiminishModifier(cmd_parms *cmd, void *offset, const char *f)
 {
     mod_auth_aux_rec *modcfg = ap_get_module_config(cmd->server->module_config, &auth_hard_module );
     modcfg->DiminishModifier = atoi(f);
     return NULL;
 }
 
-static const char *set_DistributedIPs(cmd_parms *cmd, void *offset, const char *f, const char *t)
+static const char *set_DistributedIPs(cmd_parms *cmd, void *offset, const char *f)
 {
     mod_auth_aux_rec *modcfg = ap_get_module_config(cmd->server->module_config, &auth_hard_module );
     modcfg->DistributedIPs = atoi(f);
     return NULL;
 }
 
-static const char *set_DistributedTime(cmd_parms *cmd, void *offset, const char *f, const char *t)
+static const char *set_DistributedTime(cmd_parms *cmd, void *offset, const char *f)
 {
     mod_auth_aux_rec *modcfg = ap_get_module_config(cmd->server->module_config, &auth_hard_module );
     modcfg->DistributedTime = atoi(f);
     return NULL;
 }
 
-static const char *set_LockoutTime(cmd_parms *cmd, void *offset, const char *f, const char *t)
+static const char *set_LockoutTime(cmd_parms *cmd, void *offset, const char *f)
 {
     mod_auth_aux_rec *modcfg = ap_get_module_config(cmd->server->module_config, &auth_hard_module );
     modcfg->LockoutTime = atoi(f);
     return NULL;
 }
 
-static const char *set_DBName(cmd_parms *cmd, void *offset, const char *f, const char *t)
+static const char *set_DBName(cmd_parms *cmd, void *offset, const char *f)
 {
     mod_auth_aux_rec *modcfg = ap_get_module_config(cmd->server->module_config, &auth_hard_module );
     modcfg->DBName = (char*)f;
     return NULL;
 }
 
-static const char *set_DBUser(cmd_parms *cmd, void *offset, const char *f, const char *t)
+static const char *set_DBUser(cmd_parms *cmd, void *offset, const char *f)
 {
     mod_auth_aux_rec *modcfg = ap_get_module_config(cmd->server->module_config, &auth_hard_module );
     modcfg->DBUser = (char*)f;
     return NULL;
 }
 
-static const char *set_DBPassword(cmd_parms *cmd, void *offset, const char *f, const char *t)
+static const char *set_DBPassword(cmd_parms *cmd, void *offset, const char *f)
 {
     mod_auth_aux_rec *modcfg = ap_get_module_config(cmd->server->module_config, &auth_hard_module );
     modcfg->DBPassword = (char*)f;
