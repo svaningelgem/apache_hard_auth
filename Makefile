@@ -4,9 +4,9 @@
 ##
 
 builddir=.
-top_srcdir=/usr/local/apache2
-top_builddir=/usr/local/apache2
-include /usr/local/apache2/build/special.mk
+top_srcdir=/opt/local/apache2
+top_builddir=$(top_srcdir)
+include $(top_srcdir)/build/special.mk
 
 #   the used tools
 APXS=apxs
