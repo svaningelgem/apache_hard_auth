@@ -1,7 +1,7 @@
 #include "httpd.h"
 #include "http_config.h"
 #include "http_log.h"
-#include "mod_auth_aux.h"
+#include "mod_auth_hard_aux.h"
 #include <SQLAPI.h> 
 #include <math.h>
 
