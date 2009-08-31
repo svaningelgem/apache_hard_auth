@@ -8,13 +8,15 @@
 extern "C" void LogFailedUser(request_rec *r, char *auth_pwfile);
 extern "C" int IsAccountLocked(request_rec *r, char *auth_pwfile);
 extern "C" unsigned int GetSleepTimeForFailedAuthInSec(request_rec *r, char *auth_pwfile);
-extern "C" module AP_MODULE_DECLARE_DATA auth_module;
+extern "C" module AP_MODULE_DECLARE_DATA auth_hard_module;
 
 SAConnection *g_pCon = NULL;
 
-void CreateDBConnection(server_rec *s)
+bool CreateDBConnection(server_rec *s)
 {
-    mod_auth_aux_rec *modcfg = (mod_auth_aux_rec *)ap_get_module_config(s->module_config, &auth_module);
+    mod_auth_aux_rec *modcfg = (mod_auth_aux_rec *)ap_get_module_config(s->module_config, &auth_hard_module);
+
+    bool bRes = false;
 
     try
     {
@@ -22,7 +24,10 @@ void CreateDBConnection(server_rec *s)
 
         g_pCon->Connect(modcfg->DBName, modcfg->DBUser, modcfg->DBPassword, SA_MySQL_Client);
 
+
         ap_log_error(APLOG_MARK, APLOG_NOTICE, 0, s, "Connection to mod_auth database successfully created");
+
+        bRes = true;
     }
     catch(SAException &x)
     {
@@ -37,15 +42,20 @@ void CreateDBConnection(server_rec *s)
 
         ap_log_error(APLOG_MARK, APLOG_ERR, 0, s, (const char*)x.ErrText());
     }
+
+    return bRes;
 }
 
 void LogFailedUser(request_rec *r, char *auth_pwfile)
 {
-    mod_auth_aux_rec *modcfg = (mod_auth_aux_rec *)ap_get_module_config(r->server->module_config, &auth_module);
+    mod_auth_aux_rec *modcfg = (mod_auth_aux_rec *)ap_get_module_config(r->server->module_config, &auth_hard_module);
 
     if (!g_pCon)
     {
-        CreateDBConnection(r->server);
+        if (!CreateDBConnection(r->server))
+        {
+            return;
+        }
     }
 
     try
@@ -103,11 +113,14 @@ void LogFailedUser(request_rec *r, char *auth_pwfile)
 
 int IsAccountLocked(request_rec *r, char *auth_pwfile)
 {
-    mod_auth_aux_rec *modcfg = (mod_auth_aux_rec *)ap_get_module_config(r->server->module_config, &auth_module);
+    mod_auth_aux_rec *modcfg = (mod_auth_aux_rec *)ap_get_module_config(r->server->module_config, &auth_hard_module);
 
     if (!g_pCon)
     {
-        CreateDBConnection(r->server);
+        if (!CreateDBConnection(r->server))
+        {
+            return 0;
+        }
     }
 
     int nRes = 0;
@@ -172,11 +185,14 @@ int IsAccountLocked(request_rec *r, char *auth_pwfile)
 
 unsigned int GetSleepTimeForFailedAuthInSec(request_rec *r, char *auth_pwfile)
 {
-    mod_auth_aux_rec *modcfg = (mod_auth_aux_rec *)ap_get_module_config(r->server->module_config, &auth_module);
+    mod_auth_aux_rec *modcfg = (mod_auth_aux_rec *)ap_get_module_config(r->server->module_config, &auth_hard_module);
 
     if (!g_pCon)
     {
-        CreateDBConnection(r->server);
+        if (!CreateDBConnection(r->server))
+        {
+            return 0;
+        }
     }
 
     unsigned int nNewSleepTimeInSec = 0;

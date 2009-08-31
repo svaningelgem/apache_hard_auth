@@ -55,7 +55,7 @@ Modifiers:
 - lockout-time (default 1200s = 20m) 
 */
 
-module AP_MODULE_DECLARE_DATA auth_module;
+module AP_MODULE_DECLARE_DATA auth_hard_module;
 
 typedef struct {
     char *auth_pwfile;
@@ -85,63 +85,63 @@ static const char *set_auth_slot(cmd_parms *cmd, void *offset, const char *f,
 
 static const char *set_WaitModifier(cmd_parms *cmd, void *offset, const char *f, const char *t)
 {
-    mod_auth_aux_rec *modcfg = ap_get_module_config(cmd->server->module_config, &auth_module);
+    mod_auth_aux_rec *modcfg = ap_get_module_config(cmd->server->module_config, &auth_hard_module );
     modcfg->WaitModifier = atoi(f);
     return NULL;
 }
 
 static const char *set_DiminishTime(cmd_parms *cmd, void *offset, const char *f, const char *t)
 {
-    mod_auth_aux_rec *modcfg = ap_get_module_config(cmd->server->module_config, &auth_module);
+    mod_auth_aux_rec *modcfg = ap_get_module_config(cmd->server->module_config, &auth_hard_module );
     modcfg->DiminishTime = atoi(f);
     return NULL;
 }
 
 static const char *set_DiminishModifier(cmd_parms *cmd, void *offset, const char *f, const char *t)
 {
-    mod_auth_aux_rec *modcfg = ap_get_module_config(cmd->server->module_config, &auth_module);
+    mod_auth_aux_rec *modcfg = ap_get_module_config(cmd->server->module_config, &auth_hard_module );
     modcfg->DiminishModifier = atoi(f);
     return NULL;
 }
 
 static const char *set_DistributedIPs(cmd_parms *cmd, void *offset, const char *f, const char *t)
 {
-    mod_auth_aux_rec *modcfg = ap_get_module_config(cmd->server->module_config, &auth_module);
+    mod_auth_aux_rec *modcfg = ap_get_module_config(cmd->server->module_config, &auth_hard_module );
     modcfg->DistributedIPs = atoi(f);
     return NULL;
 }
 
 static const char *set_DistributedTime(cmd_parms *cmd, void *offset, const char *f, const char *t)
 {
-    mod_auth_aux_rec *modcfg = ap_get_module_config(cmd->server->module_config, &auth_module);
+    mod_auth_aux_rec *modcfg = ap_get_module_config(cmd->server->module_config, &auth_hard_module );
     modcfg->DistributedTime = atoi(f);
     return NULL;
 }
 
 static const char *set_LockoutTime(cmd_parms *cmd, void *offset, const char *f, const char *t)
 {
-    mod_auth_aux_rec *modcfg = ap_get_module_config(cmd->server->module_config, &auth_module);
+    mod_auth_aux_rec *modcfg = ap_get_module_config(cmd->server->module_config, &auth_hard_module );
     modcfg->LockoutTime = atoi(f);
     return NULL;
 }
 
 static const char *set_DBName(cmd_parms *cmd, void *offset, const char *f, const char *t)
 {
-    mod_auth_aux_rec *modcfg = ap_get_module_config(cmd->server->module_config, &auth_module);
+    mod_auth_aux_rec *modcfg = ap_get_module_config(cmd->server->module_config, &auth_hard_module );
     modcfg->DBName = (char*)f;
     return NULL;
 }
 
 static const char *set_DBUser(cmd_parms *cmd, void *offset, const char *f, const char *t)
 {
-    mod_auth_aux_rec *modcfg = ap_get_module_config(cmd->server->module_config, &auth_module);
+    mod_auth_aux_rec *modcfg = ap_get_module_config(cmd->server->module_config, &auth_hard_module );
     modcfg->DBUser = (char*)f;
     return NULL;
 }
 
 static const char *set_DBPassword(cmd_parms *cmd, void *offset, const char *f, const char *t)
 {
-    mod_auth_aux_rec *modcfg = ap_get_module_config(cmd->server->module_config, &auth_module);
+    mod_auth_aux_rec *modcfg = ap_get_module_config(cmd->server->module_config, &auth_hard_module );
     modcfg->DBPassword = (char*)f;
     return NULL;
 }
@@ -260,7 +260,7 @@ unsigned int GetSleepTimeForFailedAuthInSec(request_rec *r, char *auth_pwfile);
 static int authenticate_basic_user(request_rec *r)
 {
     auth_config_rec *conf = ap_get_module_config(r->per_dir_config,
-                                                 &auth_module);
+                                                 &auth_hard_module );
     const char *sent_pw;
     char *real_pw;
     apr_status_t invalid_pw;
@@ -310,7 +310,7 @@ static int authenticate_basic_user(request_rec *r)
 static int check_user_access(request_rec *r)
 {
     auth_config_rec *conf = ap_get_module_config(r->per_dir_config,
-                                                 &auth_module);
+                                                 &auth_hard_module );
     char *user = r->user;
     int m = r->method_number;
     int method_restricted = 0;
@@ -429,7 +429,7 @@ static void *create_perserver_config(apr_pool_t *p, server_rec *s)
     return (void *) newcfg;
 }
 
-module AP_MODULE_DECLARE_DATA auth_module =
+module AP_MODULE_DECLARE_DATA auth_hard_module =
 {
     STANDARD20_MODULE_STUFF,
     create_auth_dir_config,     /* dir config creater */
