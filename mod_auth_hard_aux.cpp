@@ -14,7 +14,7 @@ SAConnection *g_pCon = NULL;
 
 bool CreateDBConnection(server_rec *s)
 {
-    mod_auth_aux_rec *modcfg = (mod_auth_aux_rec *)ap_get_module_config(s->module_config, &auth_hard_module);
+    auth_config_rec_server *modcfg = (auth_config_rec_server*)ap_get_module_config(s->module_config, &auth_hard_module);
 
     bool bRes = false;
 
@@ -48,7 +48,7 @@ bool CreateDBConnection(server_rec *s)
 
 void LogFailedUser(request_rec *r, char *auth_pwfile)
 {
-    mod_auth_aux_rec *modcfg = (mod_auth_aux_rec *)ap_get_module_config(r->server->module_config, &auth_hard_module);
+    auth_config_rec *modcfg = (auth_config_rec *)ap_get_module_config(r->per_dir_config, &auth_hard_module);
 
     if (!g_pCon)
     {
@@ -113,7 +113,7 @@ void LogFailedUser(request_rec *r, char *auth_pwfile)
 
 int IsAccountLocked(request_rec *r, char *auth_pwfile)
 {
-    mod_auth_aux_rec *modcfg = (mod_auth_aux_rec *)ap_get_module_config(r->server->module_config, &auth_hard_module);
+    auth_config_rec *modcfg = (auth_config_rec *)ap_get_module_config(r->per_dir_config, &auth_hard_module);
 
     if (!g_pCon)
     {
@@ -185,7 +185,7 @@ int IsAccountLocked(request_rec *r, char *auth_pwfile)
 
 unsigned int GetSleepTimeForFailedAuthInSec(request_rec *r, char *auth_pwfile)
 {
-    mod_auth_aux_rec *modcfg = (mod_auth_aux_rec *)ap_get_module_config(r->server->module_config, &auth_hard_module);
+    auth_config_rec *modcfg = (auth_config_rec *)ap_get_module_config(r->per_dir_config, &auth_hard_module);
 
     if (!g_pCon)
     {
