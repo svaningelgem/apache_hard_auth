@@ -1,9 +1,4 @@
-DROP DATABASE IF EXISTS mod_auth;
-CREATE DATABASE mod_auth;
-USE mod_auth;
-
-DROP TABLE IF EXISTS failed_logins;
-CREATE TABLE failed_logins
+CREATE TABLE IF NOT EXISTS failed_logins
 (
     id              INT(9) NOT NULL AUTO_INCREMENT PRIMARY KEY,
     ip              VARCHAR(15),    
@@ -13,10 +8,9 @@ CREATE TABLE failed_logins
     INDEX(ip),
     INDEX(user),
     INDEX(passfile)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+);
 
-DROP TABLE IF EXISTS locked_accounts;
-CREATE TABLE locked_accounts
+CREATE TABLE IF NOT EXISTS locked_accounts
 (
     id              INT(9) NOT NULL AUTO_INCREMENT PRIMARY KEY,
     user            VARCHAR(128),
@@ -24,10 +18,9 @@ CREATE TABLE locked_accounts
     locked_at       TIMESTAMP,  
     INDEX(user),
     INDEX(passfile)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+);
 
-DROP TABLE IF EXISTS last_penalty_time;
-CREATE TABLE last_penalty_time
+CREATE TABLE IF NOT EXISTS last_penalty_time
 (
     id               INT(9) NOT NULL AUTO_INCREMENT PRIMARY KEY,
     user             VARCHAR(128),
@@ -37,4 +30,4 @@ CREATE TABLE last_penalty_time
     calculated_at    TIMESTAMP,
     INDEX(user),
     INDEX(passfile)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+);
