@@ -23,11 +23,8 @@ CREATE TABLE IF NOT EXISTS locked_accounts
 CREATE TABLE IF NOT EXISTS last_penalty_time
 (
     id               INT(9) NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    user             VARCHAR(128),
-    passfile         VARCHAR(255),
     ip               VARCHAR(15),    
     sleeptime_in_sec INT(9),
     calculated_at    TIMESTAMP,
-    INDEX(user),
-    INDEX(passfile)
+    INDEX(ip)
 );
