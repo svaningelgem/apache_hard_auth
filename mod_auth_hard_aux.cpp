@@ -199,11 +199,9 @@ unsigned int GetSleepTimeForFailedAuthInSec(request_rec *r, char *auth_pwfile)
 
     try
     {
-        //1. get the last sleep time = lst for this user/ip and the time it was calculated == calculated_at from last_penalty_time
-        SACommand selectcmd(g_pCon, "SELECT sleeptime_in_sec, NOW() - calculated_at AS timedelta FROM last_penalty_time WHERE user=:1 AND passfile=:2 AND ip=:3");
-        selectcmd.Param(1).setAsString() = r->user;
-        selectcmd.Param(2).setAsString() = auth_pwfile;
-        selectcmd.Param(3).setAsString() = r->connection->remote_ip;
+        //1. get the last sleep time = lst for this ip and the time it was calculated == calculated_at from last_penalty_time
+        SACommand selectcmd(g_pCon, "SELECT sleeptime_in_sec, NOW() - calculated_at AS timedelta FROM last_penalty_time WHERE ip=:1");
+        selectcmd.Param(1).setAsString() = r->connection->remote_ip;
         selectcmd.Execute();
 
         unsigned int nLastSleepTime = 0;
@@ -221,11 +219,9 @@ unsigned int GetSleepTimeForFailedAuthInSec(request_rec *r, char *auth_pwfile)
             //2. if not found insert new sleep time = 1 in last_penalty_time and return it 
             nNewSleepTimeInSec = 1;
 
-            SACommand insertcmd(g_pCon, "INSERT INTO last_penalty_time(user, passfile, ip, sleeptime_in_sec, calculated_at) VALUES(:1, :2, :3, :4, NOW())");
-            insertcmd.Param(1).setAsString() = r->user;
-            insertcmd.Param(2).setAsString() = auth_pwfile;
-            insertcmd.Param(3).setAsString() = r->connection->remote_ip;
-            insertcmd.Param(4).setAsLong() = nNewSleepTimeInSec;
+            SACommand insertcmd(g_pCon, "INSERT INTO last_penalty_time(ip, sleeptime_in_sec, calculated_at) VALUES(:1, :2, NOW())");
+            insertcmd.Param(1).setAsString() = r->connection->remote_ip;
+            insertcmd.Param(2).setAsLong() = nNewSleepTimeInSec;
             insertcmd.Execute();
             g_pCon->Commit();
         }
@@ -241,11 +237,9 @@ unsigned int GetSleepTimeForFailedAuthInSec(request_rec *r, char *auth_pwfile)
             }
 
             //5. update new sleep time in last_penalty_time and return it
-            SACommand updatecmd(g_pCon, "UPDATE last_penalty_time SET sleeptime_in_sec=:1, calculated_at=NOW() WHERE user=:2 AND passfile=:3 AND ip=:4");
+            SACommand updatecmd(g_pCon, "UPDATE last_penalty_time SET sleeptime_in_sec=:1, calculated_at=NOW() WHERE ip=:2");
             updatecmd.Param(1).setAsLong() = nNewSleepTimeInSec;
-            updatecmd.Param(2).setAsString() = r->user;
-            updatecmd.Param(3).setAsString() = auth_pwfile;
-            updatecmd.Param(4).setAsString() = r->connection->remote_ip;
+            updatecmd.Param(2).setAsString() = r->connection->remote_ip;
             updatecmd.Execute();
             g_pCon->Commit();
         }

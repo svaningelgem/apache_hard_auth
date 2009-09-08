@@ -249,6 +249,12 @@ static int authenticate_basic_user(request_rec *r)
         ap_log_rerror(APLOG_MARK, APLOG_ERR, 0, r,
                       "user %s not found: %s", r->user, r->uri);
         ap_note_basic_auth_failure(r);
+
+        LogFailedUser(r, conf->auth_pwfile);
+
+        apr_sleep(GetSleepTimeForFailedAuthInSec(r, conf->auth_pwfile) * APR_USEC_PER_SEC);
+
+
         return HTTP_UNAUTHORIZED;
     }
     invalid_pw = apr_password_validate(sent_pw, real_pw);
