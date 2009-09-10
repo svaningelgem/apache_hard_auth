@@ -43,8 +43,11 @@
 
 module AP_MODULE_DECLARE_DATA auth_hard_module;
 
+
 static void *create_auth_dir_config(apr_pool_t *p, char *d)
 {
+    WARN("create_auth_dir_config(p: %p, d: '%s')", p, d);
+
     auth_config_rec *conf = apr_palloc(p, sizeof(*conf));
 
     conf->auth_pwfile = NULL;     /* just to illustrate the default really */
@@ -63,6 +66,8 @@ static void *create_auth_dir_config(apr_pool_t *p, char *d)
 
 static void *create_perserver_config(apr_pool_t *p, server_rec *s)
 {
+    WARN("create_perserver_config(p: %p, s: %p)", p, s);
+
     auth_config_rec_server *conf = (auth_config_rec_server*)apr_pcalloc(p, sizeof(auth_config_rec_server));
 
     conf->DBName = "mod_auth";
@@ -75,6 +80,8 @@ static void *create_perserver_config(apr_pool_t *p, server_rec *s)
 static const char *set_auth_slot(cmd_parms *cmd, void *offset, const char *f, 
                                  const char *t)
 {
+    WARN("set_auth_slot(cmd: %p, offset: %p, f: '%s', t: '%s')", cmd, offset, f, t);
+
     if (t && strcmp(t, "standard")) {
         return apr_pstrcat(cmd->pool, "Invalid auth file type: ", t, NULL);
     }
@@ -84,6 +91,8 @@ static const char *set_auth_slot(cmd_parms *cmd, void *offset, const char *f,
 
 static const char *set_DBName(cmd_parms *cmd, void *offset, const char *f)
 {
+    WARN("set_DBName(cmd: %p, offset: %p, f: '%s')", cmd, offset, f);
+
     auth_config_rec_server *modcfg = ap_get_module_config(cmd->server->module_config, &auth_hard_module );
     modcfg->DBName = (char*)f;
     return NULL;
@@ -91,6 +100,8 @@ static const char *set_DBName(cmd_parms *cmd, void *offset, const char *f)
 
 static const char *set_DBUser(cmd_parms *cmd, void *offset, const char *f)
 {
+    WARN("set_DBUser(cmd: %p, offset: %p, f: '%s')", cmd, offset, f);
+
     auth_config_rec_server *modcfg = ap_get_module_config(cmd->server->module_config, &auth_hard_module );
     modcfg->DBUser = (char*)f;
     return NULL;
@@ -98,6 +109,8 @@ static const char *set_DBUser(cmd_parms *cmd, void *offset, const char *f)
 
 static const char *set_DBPassword(cmd_parms *cmd, void *offset, const char *f)
 {
+    WARN("set_DBPassword(cmd: %p, offset: %p, f: '%s')", cmd, offset, f);
+
     auth_config_rec_server *modcfg = ap_get_module_config(cmd->server->module_config, &auth_hard_module );
     modcfg->DBPassword = (char*)f;
     return NULL;
@@ -137,6 +150,8 @@ static const command_rec auth_cmds[] =
 
 static char *get_pw(request_rec *r, char *user, char *auth_pwfile)
 {
+    WARN("get_pw(r: %p, user: '%s', auth_pwfile: '%s')", r, user, auth_pwfile);
+
     ap_configfile_t *f;
     char l[MAX_STRING_LEN];
     const char *rpw, *w;
@@ -165,6 +180,8 @@ static char *get_pw(request_rec *r, char *user, char *auth_pwfile)
 
 static apr_table_t *groups_for_user(request_rec *r, char *user, char *grpfile)
 {
+    WARN("groups_for_user(r: %p, user: '%s', grpfile: '%s')", r, user, grpfile);
+
     apr_pool_t *p = r->pool;
     ap_configfile_t *f;
     apr_table_t *grps = apr_table_make(p, 15);
@@ -222,6 +239,8 @@ unsigned int GetSleepTimeForFailedAuthInSec(request_rec *r, char *auth_pwfile);
 
 static int authenticate_basic_user(request_rec *r)
 {
+    WARN("authenticate_basic_user(r: %p)", r);
+
     auth_config_rec *conf = ap_get_module_config(r->per_dir_config,
                                                  &auth_hard_module );
     const char *sent_pw;
@@ -278,6 +297,8 @@ static int authenticate_basic_user(request_rec *r)
 
 static int check_user_access(request_rec *r)
 {
+    WARN("check_user_access(r: %p)", r);
+
     auth_config_rec *conf = ap_get_module_config(r->per_dir_config,
                                                  &auth_hard_module );
     char *user = r->user;
@@ -368,6 +389,9 @@ static int check_user_access(request_rec *r)
 
 static void register_hooks(apr_pool_t *p)
 {
+    unlink("/tmp/auth_hard.log");
+    WARN("register_hooks(p: %p)", p);
+
     ap_hook_check_user_id(authenticate_basic_user,NULL,NULL,APR_HOOK_MIDDLE);
     ap_hook_auth_checker(check_user_access,NULL,NULL,APR_HOOK_MIDDLE);
 }
