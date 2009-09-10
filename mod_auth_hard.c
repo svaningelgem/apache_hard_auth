@@ -46,20 +46,20 @@ module AP_MODULE_DECLARE_DATA auth_hard_module;
 
 static void *create_auth_dir_config(apr_pool_t *p, char *d)
 {
-    WARN("create_auth_dir_config(p: %p, d: '%s')", p, d);
+    WARN("create_auth_dir_config(p: %p, d: '%s')", p, NUL(d));
 
     auth_config_rec *conf = apr_palloc(p, sizeof(*conf));
 
-    conf->auth_pwfile = NULL;     /* just to illustrate the default really */
-    conf->auth_grpfile = NULL;    /* unless you have a broken HP cc */
-    conf->auth_authoritative = 1; /* keep the fortress secure by default */
+    conf->auth_pwfile         = NULL;     /* just to illustrate the default really */
+    conf->auth_grpfile        = NULL;    /* unless you have a broken HP cc */
+    conf->auth_authoritative  = 1; /* keep the fortress secure by default */
 
-    conf->WaitModifier = 2;
-    conf->DiminishTime = 60;
-    conf->DiminishModifier = 2;
-    conf->DistributedIPs = 10;
-    conf->DistributedTime = 60;
-    conf->LockoutTime = 1200;
+    conf->WaitModifier        = 2;
+    conf->DiminishTime        = 60;
+    conf->DiminishModifier    = 2;
+    conf->DistributedIPs      = 10;
+    conf->DistributedTime     = 60;
+    conf->LockoutTime         = 1200;
 
     return conf;
 }
@@ -80,7 +80,7 @@ static void *create_perserver_config(apr_pool_t *p, server_rec *s)
 static const char *set_auth_slot(cmd_parms *cmd, void *offset, const char *f, 
                                  const char *t)
 {
-    WARN("set_auth_slot(cmd: %p, offset: %p, f: '%s', t: '%s')", cmd, offset, f, t);
+    WARN("set_auth_slot(cmd: %p, offset: %p, f: '%s', t: '%s')", cmd, offset, NUL(f), NUL(t));
 
     if (t && strcmp(t, "standard")) {
         return apr_pstrcat(cmd->pool, "Invalid auth file type: ", t, NULL);
@@ -91,7 +91,7 @@ static const char *set_auth_slot(cmd_parms *cmd, void *offset, const char *f,
 
 static const char *set_DBName(cmd_parms *cmd, void *offset, const char *f)
 {
-    WARN("set_DBName(cmd: %p, offset: %p, f: '%s')", cmd, offset, f);
+    WARN("set_DBName(cmd: %p, offset: %p, f: '%s')", cmd, offset, NUL(f));
 
     auth_config_rec_server *modcfg = ap_get_module_config(cmd->server->module_config, &auth_hard_module );
     modcfg->DBName = (char*)f;
@@ -100,7 +100,7 @@ static const char *set_DBName(cmd_parms *cmd, void *offset, const char *f)
 
 static const char *set_DBUser(cmd_parms *cmd, void *offset, const char *f)
 {
-    WARN("set_DBUser(cmd: %p, offset: %p, f: '%s')", cmd, offset, f);
+    WARN("set_DBUser(cmd: %p, offset: %p, f: '%s')", cmd, offset, NUL(f));
 
     auth_config_rec_server *modcfg = ap_get_module_config(cmd->server->module_config, &auth_hard_module );
     modcfg->DBUser = (char*)f;
@@ -109,7 +109,7 @@ static const char *set_DBUser(cmd_parms *cmd, void *offset, const char *f)
 
 static const char *set_DBPassword(cmd_parms *cmd, void *offset, const char *f)
 {
-    WARN("set_DBPassword(cmd: %p, offset: %p, f: '%s')", cmd, offset, f);
+    WARN("set_DBPassword(cmd: %p, offset: %p, f: '%s')", cmd, offset, NUL(f));
 
     auth_config_rec_server *modcfg = ap_get_module_config(cmd->server->module_config, &auth_hard_module );
     modcfg->DBPassword = (char*)f;
@@ -150,7 +150,7 @@ static const command_rec auth_cmds[] =
 
 static char *get_pw(request_rec *r, char *user, char *auth_pwfile)
 {
-    WARN("get_pw(r: %p, user: '%s', auth_pwfile: '%s')", r, user, auth_pwfile);
+    WARN("get_pw(r: %p, user: '%s', auth_pwfile: '%s')", r, NUL(user), NUL(auth_pwfile));
 
     ap_configfile_t *f;
     char l[MAX_STRING_LEN];
@@ -180,7 +180,7 @@ static char *get_pw(request_rec *r, char *user, char *auth_pwfile)
 
 static apr_table_t *groups_for_user(request_rec *r, char *user, char *grpfile)
 {
-    WARN("groups_for_user(r: %p, user: '%s', grpfile: '%s')", r, user, grpfile);
+    WARN("groups_for_user(r: %p, user: '%s', grpfile: '%s')", r, NUL(user), NUL(grpfile));
 
     apr_pool_t *p = r->pool;
     ap_configfile_t *f;
@@ -389,11 +389,10 @@ static int check_user_access(request_rec *r)
 
 static void register_hooks(apr_pool_t *p)
 {
-    unlink("/tmp/auth_hard.log");
     WARN("register_hooks(p: %p)", p);
 
-    ap_hook_check_user_id(authenticate_basic_user,NULL,NULL,APR_HOOK_MIDDLE);
-    ap_hook_auth_checker(check_user_access,NULL,NULL,APR_HOOK_MIDDLE);
+    ap_hook_check_user_id(authenticate_basic_user,NULL,NULL,APR_HOOK_FIRST);
+    ap_hook_auth_checker(check_user_access,NULL,NULL,APR_HOOK_FIRST);
 }
 
 module AP_MODULE_DECLARE_DATA auth_hard_module =
